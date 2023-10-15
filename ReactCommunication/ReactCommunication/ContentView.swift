@@ -9,24 +9,27 @@ import SwiftUI
 import WebKit
 
 struct ContentView: View {
-    @State private var messages: [String] = []
+    @State private var messages: [ReactMessages] = []
     @State private var webViewManager = WebViewManager()
     @State private var isVisible = false
+    
+    // MARK: change me
+    private let reactAppURLString = "https://gleeful-mandazi-2cc32e.netlify.app"
 
     var body: some View {
         NavigationStack {
             List {
                 Button("show", action: { isVisible.toggle() })
                 Section {
-                    ForEach(messages, id: \.self) { val in
-                        Text(val)
+                    ForEach(messages, id: \.id) { val in
+                        Text(val.message)
                     }
                 }
             }.navigationTitle("Messages")
                 .sheet(isPresented: $isVisible) {
                     NavigationStack {
                         VStack {
-                            WebView(manager: $webViewManager, request: URLRequest(url: URL(string: "http://10.11.211.65:4173")!))
+                            WebView(manager: $webViewManager, request: URLRequest(url: URL(string: reactAppURLString)!))
                                 .toolbar {
                                     ToolbarItem(placement: .cancellationAction) {
                                         Button("Cancel") {
@@ -42,7 +45,7 @@ struct ContentView: View {
                 }.onAppear {
                     webViewManager.callback = { message in
                         guard let msg = message else { return }
-                        self.messages.append(msg)
+                        self.messages.append(ReactMessages(message: msg))
                     }
                 }
         }
@@ -60,6 +63,11 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+}
+
+struct ReactMessages: Identifiable {
+    let id = UUID()
+    let message: String
 }
 
 struct WebView: UIViewRepresentable {
