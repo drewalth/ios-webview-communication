@@ -12,8 +12,9 @@ struct ContentView: View {
     @State private var messages: [ReactMessages] = []
     @State private var webViewManager = WebViewManager()
     @State private var isVisible = false
-    
+
     // MARK: change me
+
     private let reactAppURLString = "https://gleeful-mandazi-2cc32e.netlify.app"
 
     var body: some View {
@@ -43,9 +44,11 @@ struct ContentView: View {
                         }
                     }
                 }.onAppear {
-                    webViewManager.callback = { message in
-                        guard let msg = message else { return }
-                        self.messages.append(ReactMessages(message: msg))
+                    if webViewManager.callback == nil {
+                        webViewManager.callback = { message in
+                            guard let msg = message else { return }
+                            self.messages.append(ReactMessages(message: msg))
+                        }
                     }
                 }
         }
